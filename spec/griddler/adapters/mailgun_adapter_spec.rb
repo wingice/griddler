@@ -23,6 +23,16 @@ describe Griddler::Adapters::MailgunAdapter, '.normalize_params' do
     expect(normalized_params[:cc]).to eq ['emily@example.mailgun.org']
   end
 
+  it 'when message-headers is a string ' do
+    params = default_params.merge(
+      Cc: '',
+      'message-headers' => '[["Cc", "emily@example.mailgun.org"]]'
+    )
+    normalized_params = Griddler::Adapters::MailgunAdapter.normalize_params(params)
+    expect(normalized_params[:cc]).to eq ['emily@example.mailgun.org']
+  end
+
+  
   it 'passes the received array of files' do
     params = default_params.merge(
       'attachment-count' => 2,

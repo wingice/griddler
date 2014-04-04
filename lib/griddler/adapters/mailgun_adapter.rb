@@ -39,7 +39,10 @@ module Griddler
       def extract_header(key)
         return nil unless params['message-headers'].present?
 
-        headers = params['message-headers'].select do |h|
+        message_headers = params['message-headers']
+        message_headers = JSON.parse(message_headers) if message_headers.is_a?(String)
+
+        headers = message_headers.select do |h|
           h.first.to_s == key.to_s
         end
         headers.flatten.last

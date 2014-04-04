@@ -33,6 +33,7 @@ module Griddler
 
       def ccs
         cc = param_or_header(:Cc)
+        return [] unless cc
         cc.split(',').map(&:strip)
       end
 

@@ -32,6 +32,15 @@ describe Griddler::Adapters::MailgunAdapter, '.normalize_params' do
     expect(normalized_params[:cc]).to eq ['emily@example.mailgun.org']
   end
 
+  it 'CC is empty, should be OK' do
+    params = default_params.merge(
+      Cc: '',
+      'message-headers' => '[["NotCc", "emily@example.mailgun.org"]]'
+    )
+    normalized_params = Griddler::Adapters::MailgunAdapter.normalize_params(params)
+    expect(normalized_params[:cc]).to eq []
+  end
+
   
   it 'passes the received array of files' do
     params = default_params.merge(

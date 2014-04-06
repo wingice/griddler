@@ -11,6 +11,8 @@ module Griddler
       end
 
       def normalize_params
+        params['message-headers'] = JSON.parse(params['message-headers']) if params['message-headers'].is_a?(String)
+
         params.merge(
           to: tos,
           cc: ccs,
@@ -39,11 +41,7 @@ module Griddler
 
       def extract_header(key)
         return nil unless params['message-headers'].present?
-
-        message_headers = params['message-headers']
-        message_headers = JSON.parse(message_headers) if message_headers.is_a?(String)
-
-        headers = message_headers.select do |h|
+        headers = params['message-headers'].select do |h|
           h.first.to_s == key.to_s
         end
         headers.flatten.last

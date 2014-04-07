@@ -16,7 +16,7 @@ module Griddler
           cc: ccs,
           text: params['body-plain'],
           html: params['body-html'],
-          headers: params['message-headers'],
+          headers: multi_line_headers,
           attachments: attachment_files
         )
       end
@@ -24,6 +24,16 @@ module Griddler
       private
 
       attr_reader :params
+
+      def parse_headers(msg_headers)
+        msg_headers.is_a?(String) ? JSON.parse(msg_headers) : msg_headers
+      end
+
+      def multi_line_headers
+        return '' if  params['message-headers'].blank? 
+        array_headers = parse_headers(params['message-headers'])
+        array_headers.map {|h| "#{h.first}: #{h.last}" }.join("\r\n") 
+      end
 
       def tos
         to = param_or_header(:To)
@@ -40,9 +50,7 @@ module Griddler
       def extract_header(key)
         return nil unless params['message-headers'].present?
 
-        msg_headers = params['message-headers'] 
-        msg_headers = JSON.parse(params['message-headers']) if msg_headers.is_a?(String)
-
+        msg_headers = parse_headers(params['message-headers'])
         headers = msg_headers.select do |h|
           h.first.to_s == key.to_s
         end

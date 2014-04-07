@@ -32,13 +32,23 @@ describe Griddler::Adapters::MailgunAdapter, '.normalize_params' do
     expect(normalized_params[:cc]).to eq ['emily@example.mailgun.org']
   end
 
-  it 'CC is empty, should be OK' do
+  it 'should be OK when Cc not existed' do
     params = default_params.merge(
       Cc: '',
       'message-headers' => '[["NotCc", "emily@example.mailgun.org"]]'
     )
     normalized_params = Griddler::Adapters::MailgunAdapter.normalize_params(params)
     expect(normalized_params[:cc]).to eq []
+  end
+
+  it 'should transform the message-headers to the format EmailParser understands' do
+    params = default_params.merge(
+      Cc: '',
+      'message-headers' => '[["NotCc", "emily@example.mailgun.org"], ["Reply-To", "mail2@example.mailgun.org"]]'
+    )
+    normalized_params = Griddler::Adapters::MailgunAdapter.normalize_params(params)
+    email = Griddler::Email.new(normalized_params)
+    email.headers["Reply-To"].should eq "mail2@example.mailgun.org"
   end
 
   
